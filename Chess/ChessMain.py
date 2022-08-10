@@ -35,10 +35,13 @@ def main():
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
     game_state = ChessEngine.GameState()
+    valid_moves = game_state.getValidMoves()
+    move_made = False
     loadImages()  # do this only once before while loop
     running = True
     square_selected = ()  # no square is selected initially, this will keep track of the last click of the user
     player_clicks = []  # this will keep track of player clicks (two tuples)
+
     while running:
         for e in p.event.get():
             if e.type == p.QUIT:
@@ -58,14 +61,20 @@ def main():
                 if len(player_clicks) == 2:  # after 2nd click
                     move = ChessEngine.Move(player_clicks[0], player_clicks[1], game_state.board)
                     print(move.getChessNotation())
-                    game_state.makeMove(move)
+                    if move in valid_moves:
+                        game_state.makeMove(move)
+                        move_made = True
                     square_selected = ()
                     player_clicks = []
 
             elif e.type == p.KEYDOWN:
                 if e.key == p.K_z:
                     game_state.undoMove()
+                    move_made = True
 
+        if move_made:
+            valid_moves = game_state.getValidMoves()
+            move_made = False
 
         drawGameState(screen, game_state)
         clock.tick(MAX_FPS)

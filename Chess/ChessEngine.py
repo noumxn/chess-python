@@ -4,7 +4,7 @@
 
 class GameState:
     def __init__(self):
-        # board is 8x8 2D list, each element is represented by two charecters
+        # board is 8x8 2D list, each element is represented by two characters
         # 'w' or 'b' represents 'white' or 'black'
         # 'R', 'N', 'B', 'Q', 'K' and 'p' represent 'Rook', 'Knight', 'Bishop', 'Queen', 'King' and 'pawn' respectively
         # "--" represents empty space with no piece
@@ -42,6 +42,44 @@ class GameState:
             self.board[move.end_row][move.end_col] = move.piece_captured
             self.white_to_move = not self.white_to_move
 
+    def getValidMoves(self):
+        return self.getAllPossibleMoves()
+
+    def getAllPossibleMoves(self):
+        moves = [Move((6, 4), (4, 4), self.board)]
+        for r in range(len(self.board)):
+            for c in range(len(self.board[r])):
+                turn = self.board[r][c][0]
+                if (turn == 'w' and self.white_to_move) and (turn == 'b' and not self.white_to_move):
+                    piece = self.board[r][c][1]
+                    if piece == 'p':
+                        self.getPawnMoves(r, c, moves)
+                    elif piece == 'R':
+                        self.getRookMoves(r, c, moves)
+                    elif piece == 'B':
+                        self.getBishopMoves(r, c, moves)
+                    elif piece == 'Q':
+                        self.getQueenMoves(r, c, moves)
+                    elif piece == 'K':
+                        self.getKingMoves(r, c, moves)
+        return moves
+
+    def getPawnMoves(self, r, c, moves):
+        pass
+
+    def getRookMoves(self, r, c, moves):
+        pass
+
+    def getBishopMoves(self, r, c, moves):
+        pass
+
+    def getQueenMoves(self, r, c, moves):
+        pass
+
+    def getKingMoves(self, r, c, moves):
+        pass
+
+
 class Move:
     # in chess, fields on the board are described by two symbols, one of them being number between 1-8 (which is
     # corresponding to rows) and the second one being a letter between a-f (corresponding to columns), in order to
@@ -60,6 +98,16 @@ class Move:
         self.end_col = end_square[1]
         self.piece_moved = board[self.start_row][self.start_col]
         self.piece_captured = board[self.end_row][self.end_col]
+        self.moveID = self.start_row * 1000 + self.start_col * 100 + self.end_row * 10 + self.end_col
+        print(self.moveID)
+
+    def __eq__(self, other):
+        """
+        Overriding the equals method.
+        """
+        if isinstance(other, Move):
+            return self.moveID == other.moveID
+        return False
 
     def getChessNotation(self):
         return self.getRankFile(self.start_row, self.start_col) + self.getRankFile(self.end_row, self.end_col)
