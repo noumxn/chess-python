@@ -32,6 +32,15 @@ class GameState:
         self.move_log.append(move)  # log the move so we can undo it later
         self.white_to_move = not self.white_to_move  # switch players
 
+    def undoMove(self):
+        """
+        Undo the last move
+        """
+        if len(self.move_log) != 0:  # make sure that there is a move to undo
+            move = self.move_log.pop()
+            self.board[move.start_row][move.start_col] = move.piece_moved
+            self.board[move.end_row][move.end_col] = move.piece_captured
+            self.white_to_move = not self.white_to_move
 
 class Move:
     # in chess, fields on the board are described by two symbols, one of them being number between 1-8 (which is

@@ -62,6 +62,11 @@ def main():
                     square_selected = ()
                     player_clicks = []
 
+            elif e.type == p.KEYDOWN:
+                if e.key == p.K_z:
+                    game_state.undoMove()
+
+
         drawGameState(screen, game_state)
         clock.tick(MAX_FPS)
         p.display.flip()
