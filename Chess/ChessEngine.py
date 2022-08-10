@@ -81,19 +81,39 @@ class GameState:
                 if self.board[row + 1][col + 1][0] == 'w':
                     moves.append(Move((row, col), (row + 1, col + 1), self.board))
 
-    def getRookMoves(self, r, c, moves):
+    def getRookMoves(self, row, col, moves):
+        directions = ((-1, 0), (0, -1), (1, 0), (0, 1))     # up, left, down, right
+        # enemy_color = "b" if self.white_to_move else "w"
+        if self.white_to_move:
+            enemy_color = 'b'
+        else:
+            enemy_color = 'w'
+        for d in directions:
+            for i in range(1, 8):
+                end_row = row + d[0] * i
+                end_col = col + d[1] * i
+                if 0 <= end_row < 8 and 0 <= end_col < 8:
+                    end_piece = self.board[end_row][end_col]
+                    if end_piece == '--':
+                        moves.append(Move((row, col), (end_row, end_col), self.board))
+                    elif end_piece[0] == enemy_color:
+                        moves.append(Move((row, col), (end_row, end_col), self.board))
+                        break
+                    else:
+                        break
+                else:
+                    break
+
+    def getBishopMoves(self, row, col, moves):
         pass
 
-    def getBishopMoves(self, r, c, moves):
+    def getQueenMoves(self, row, col, moves):
         pass
 
-    def getQueenMoves(self, r, c, moves):
+    def getKingMoves(self, row, col, moves):
         pass
 
-    def getKingMoves(self, r, c, moves):
-        pass
-
-    def getKnightMoves(self, r, c, moves):
+    def getKnightMoves(self, row, col, moves):
         pass
 
 
