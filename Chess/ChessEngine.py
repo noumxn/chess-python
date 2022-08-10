@@ -23,6 +23,10 @@ class GameState:
                               "B": self.getBishopMoves, "Q": self.getQueenMoves, "K": self.getKingMoves}
         self.white_to_move = True
         self.move_log = []
+        self.white_king_location = [7, 4]
+        self.black_king_location = [0, 4]
+        self.check_mate = False
+        self.stale_mate = False
 
     def makeMove(self, move):
         """
@@ -33,6 +37,10 @@ class GameState:
         self.board[move.end_row][move.end_col] = move.piece_moved
         self.move_log.append(move)  # log the move so we can undo it later
         self.white_to_move = not self.white_to_move  # switch players
+        if move.piece_moved == 'wK':
+            self.white_king_location = (move.end_row, move.end_col)
+        if move.piece_moved == 'bK':
+            self.black_king_location = (move.end_row, move.end_col)
 
     def undoMove(self):
         """
@@ -43,9 +51,44 @@ class GameState:
             self.board[move.start_row][move.start_col] = move.piece_moved
             self.board[move.end_row][move.end_col] = move.piece_captured
             self.white_to_move = not self.white_to_move
+            if move.piece_moved == 'wK':
+                self.white_king_location = (move.start_row, move.start_col)
+            if move.piece_moved == 'bK':
+                self.black_king_location = (move.start_row, move.start_col)
 
     def getValidMoves(self):
-        return self.getAllPossibleMoves()
+        moves = self.getAllPossibleMoves()
+        for i in range(len(moves)-1, -1, -1):
+            self.makeMove(moves[i])
+            self.white_to_move = not self.white_to_move
+            if self.in_check():
+                moves.remove(moves[i])
+            self.white_to_move = not self.white_to_move
+            self.undoMove()
+        if len(moves) == 0:
+            if self.in_check():
+                self.check_mate = True
+            else:
+                self.stale_mate = True
+        else:
+            self.check_mate = False
+            self.stale_mate = False
+        return moves
+
+    def in_check(self):
+        if self.white_to_move:
+            return self.square_under_attack(self.white_king_location[0], self.white_king_location[1])
+        else:
+            return self.square_under_attack(self.black_king_location[0], self.black_king_location[1])
+
+    def square_under_attack(self, row, col):
+        self.white_to_move = not self.white_to_move
+        opp_moves = self.getAllPossibleMoves()
+        self.white_to_move = not self.white_to_move
+        for move in opp_moves:
+            if move.end_row == row and move.end_col == col:
+                return True
+        return False
 
     def getAllPossibleMoves(self):
         moves = []
@@ -82,7 +125,7 @@ class GameState:
                     moves.append(Move((row, col), (row + 1, col + 1), self.board))
 
     def getRookMoves(self, row, col, moves):
-        directions = ((-1, 0), (0, -1), (1, 0), (0, 1))     # up, left, down, right
+        directions = ((-1, 0), (0, -1), (1, 0), (0, 1))  # up, left, down, right
         # enemy_color = "b" if self.white_to_move else "w"
         if self.white_to_move:
             enemy_color = 'b'
@@ -105,7 +148,7 @@ class GameState:
                     break
 
     def getBishopMoves(self, row, col, moves):
-        directions = ((-1, 1), (-1, -1), (1, 1), (1, -1)) # top-right, top-left, bottom-right, bottom-left
+        directions = ((-1, 1), (-1, -1), (1, 1), (1, -1))  # top-right, top-left, bottom-right, bottom-left
         enemy_color = "b" if self.white_to_move else "w"
         for d in directions:
             for i in range(1, 8):
@@ -169,7 +212,6 @@ class Move:
         self.piece_moved = board[self.start_row][self.start_col]
         self.piece_captured = board[self.end_row][self.end_col]
         self.moveID = self.start_row * 1000 + self.start_col * 100 + self.end_row * 10 + self.end_col
-        print(self.moveID)
 
     def __eq__(self, other):
         """

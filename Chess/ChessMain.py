@@ -64,8 +64,10 @@ def main():
                     if move in valid_moves:
                         game_state.makeMove(move)
                         move_made = True
-                    square_selected = ()
-                    player_clicks = []
+                        square_selected = ()
+                        player_clicks = []
+                    else:
+                        player_clicks = [square_selected]
 
             elif e.type == p.KEYDOWN:
                 if e.key == p.K_z:
