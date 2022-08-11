@@ -39,8 +39,13 @@ class GameState:
         self.white_to_move = not self.white_to_move  # switch players
         if move.piece_moved == 'wK':
             self.white_king_location = (move.end_row, move.end_col)
-        if move.piece_moved == 'bK':
+        elif move.piece_moved == 'bK':
             self.black_king_location = (move.end_row, move.end_col)
+
+        # if move.is_pawn_promotion():
+        #     self.board[move.end_row][move.end_col] = move.piece_moved[0] + 'Q'
+        if move.is_pawn_promotion:
+            self.board[move.end_row][move.end_col] = move.piece_moved[0] + "Q"
 
     def undoMove(self):
         """
@@ -58,7 +63,7 @@ class GameState:
 
     def getValidMoves(self):
         moves = self.getAllPossibleMoves()
-        for i in range(len(moves)-1, -1, -1):
+        for i in range(len(moves) - 1, -1, -1):
             self.makeMove(moves[i])
             self.white_to_move = not self.white_to_move
             if self.in_check():
@@ -211,6 +216,12 @@ class Move:
         self.end_col = end_square[1]
         self.piece_moved = board[self.start_row][self.start_col]
         self.piece_captured = board[self.end_row][self.end_col]
+        # self.is_pawn_promotion = False
+        # if (self.piece_moved == 'wp' and self.end_row == 0) or (self.piece_moved == 'bp' and self.end_row == 7):
+        #     self.is_pawn_promotion = True
+        self.is_pawn_promotion = (self.piece_moved == "wp" and self.end_row == 0) or (
+                self.piece_moved == "bp" and self.end_row == 7)
+
         self.moveID = self.start_row * 1000 + self.start_col * 100 + self.end_row * 10 + self.end_col
 
     def __eq__(self, other):
