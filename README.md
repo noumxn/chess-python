@@ -15,3 +15,5 @@ https://www.youtube.com/watch?v=NAIQyoPcjNM
 ## Sic
 - Press `z` to undo move.
 - Press `r` to restart game.
+
+- Set `player_one` and/or `player_two` in `ChessMain.py` to `True` to have a human play, and `False` to allow computer to play.
