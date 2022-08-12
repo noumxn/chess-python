@@ -1,9 +1,9 @@
 # Handles user input and displaying current GameState object
 
 import pygame as p
-import ChessEngine
+from Chess import ChessEngine, ChessAI
 
-BOARD_WIDTH = BOARD_HEIGHT = 512
+BOARD_WIDTH = BOARD_HEIGHT = 550
 DIMENSION = 8
 SQUARE_SIZE = BOARD_HEIGHT // DIMENSION
 MAX_FPS = 15
@@ -43,15 +43,18 @@ def main():
     square_selected = ()  # no square is selected initially, this will keep track of the last click of the user
     player_clicks = []  # this will keep track of player clicks (two tuples)
     game_over = False
+    player_one = True   # True if player is human, else False (white)
+    player_two = False  # True if player is human, else False (black)
 
     while running:
+        human_turn = (game_state.white_to_move and player_one) or (not game_state.white_to_move and player_two)
         for e in p.event.get():
             if e.type == p.QUIT:
                 # p.quit()
                 # sys.exit()
                 running = False
             elif e.type == p.MOUSEBUTTONDOWN:
-                if not game_over:
+                if not game_over and human_turn:
                     location = p.mouse.get_pos()  # (x, y) location of the mouse
                     col = location[0] // SQUARE_SIZE
                     row = location[1] // SQUARE_SIZE
@@ -79,6 +82,7 @@ def main():
                     game_state.undoMove()
                     move_made = True
                     animate = False
+                    game_over = False
                 if e.key == p.K_r:
                     game_state = ChessEngine.GameState()
                     valid_moves = game_state.getValidMoves()
@@ -86,6 +90,16 @@ def main():
                     player_clicks = []
                     move_made = False
                     animate = False
+                    game_over = False
+
+        # AI move finder
+        if not game_over and not human_turn:
+            ai_move = ChessAI.findBestMove(game_state, valid_moves)
+            if ai_move is None:
+                ai_move = ChessAI.findRandomMove(valid_moves)
+            game_state.makeMove(ai_move)
+            move_made = True
+            animate = True
 
         if move_made:
             if animate:
@@ -197,7 +211,7 @@ def drawText(screen, text):
                                                                  BOARD_HEIGHT / 2 - text_object.get_height() / 2)
     screen.blit(text_object, text_location)
     text_object = font.render(text, False, p.Color('black'))
-    screen.blit(text_object, text_location.move(2, 2))
+    screen.blit(text_object, text_location.move(4, 4))
 
 
 def drawText2(screen, text):
@@ -207,7 +221,7 @@ def drawText2(screen, text):
                                                                   BOARD_HEIGHT / 2 - text_object.get_height() / 2)
     screen.blit(text_object, text_location)
     text_object = font.render(text, False, p.Color('black'))
-    screen.blit(text_object, text_location.move(2, 2))
+    screen.blit(text_object, text_location.move(4, 4))
 
 
 if __name__ == "__main__":
