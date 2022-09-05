@@ -18,6 +18,7 @@ class GameState:
             ["--", "--", "--", "--", "--", "--", "--", "--"],
             ["wp", "wp", "wp", "wp", "wp", "wp", "wp", "wp"],
             ["wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"]]
+
         self.moveFunctions = {"p": self.getPawnMoves, "R": self.getRookMoves, "N": self.getKnightMoves,
                               "B": self.getBishopMoves, "Q": self.getQueenMoves, "K": self.getKingMoves}
         self.white_to_move = True
@@ -191,7 +192,8 @@ class GameState:
                         valid_square = (king_row + check[2] * i,
                                         king_col + check[3] * i)  # check[2] and check[3] are the check directions
                         valid_squares.append(valid_square)
-                        if valid_square[0] == check_row and valid_square[1] == check_col:  # once you get to piece and check
+                        if valid_square[0] == check_row and valid_square[
+                            1] == check_col:  # once you get to piece and check
                             break
                 # get rid of any moves that don't block check or move king
                 for i in range(len(moves) - 1, -1, -1):  # iterate through the list backwards when removing elements
